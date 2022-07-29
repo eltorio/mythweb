@@ -72,7 +72,7 @@
             if ($key === 'offset')  // WHY IN THE WORLD DOES 0 == 'offset'?!?!?  so we use ===
                 continue;
         // Get the length (28 == recendts; 27 == recstartts)
-            $length = $record[28] - $record[27];
+            $length = (int)$record[28] - (int)$record[27];
         // Keep track of the total time and disk space used (13 == filesize)
             $Total_Time += $length;
             if (function_exists('gmp_add')) {
@@ -81,7 +81,7 @@
             }
             else {
             // This is inaccurate, but it's the best we can get without GMP.
-                $Total_Used += $record[13];
+                $Total_Used += (int)$record[13];
             }
         // keep track of their names and how many episodes we have recorded
             $Total_Programs++;

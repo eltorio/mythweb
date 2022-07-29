@@ -31,10 +31,8 @@
         if (empty($inputs)) {
             global $db;
             $sh = $db->query('SELECT cardid,
-                                     IF(LENGTH(IFNULL(displayname,"")) > 0,
-                                        displayname,
-                                        CONCAT(cardid, ":", inputname)
-                                       ) AS name
+                                        CONCAT("Entrée:",cardid)
+                                      AS name
                                 FROM capturecard
                             ORDER BY name');
             while (list($id, $name) = $sh->fetch_row()) {

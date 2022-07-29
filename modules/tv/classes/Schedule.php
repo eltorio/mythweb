@@ -72,7 +72,8 @@ class Schedule extends MythBase {
      * @return array sorted list of record filters available to the system keyed by filterid
      **/
     public static function availableRecordFilters() {
-        static $cache = array();
+	    static $cache = array();
+	    return $cache;
         if (empty($cache)) {
             global $db;
             $cache = $db->query_keyed_list_assoc('filterid',
@@ -325,23 +326,25 @@ class Schedule extends MythBase {
             && $this->search != searchtype_manual) {
             $this->search = 0;
         }
-    // Find the recgroupid
+	// Find the recgroupid
+	/*
         $sh = $db->query('SELECT recgroupid FROM recgroups WHERE displayname = ?',
                          _or($this->recgroup, 'Default'));
         $this->recgroupid = $sh->fetch_col();
-        $sh->finish();
+	$sh->finish();
+	 */
     // Update the record
         $sh = $db->query('REPLACE INTO record (recordid,type,chanid,starttime,startdate,endtime,enddate,search,
                                                title,subtitle,description,profile,recpriority,category,
                                                maxnewest,inactive,maxepisodes,autoexpire,startoffset,endoffset,
                                                recgroup,dupmethod,dupin,station,seriesid,programid,autocommflag,
                                                findday,findtime,findid,autotranscode,parentid,transcoder,
-                                               autouserjob1,autouserjob2,autouserjob3,autouserjob4,autometadata,
+                                               autouserjob1,autouserjob2,autouserjob3,autouserjob4,
                                                playgroup,storagegroup,prefinput,
-                                               next_record,last_record,last_delete,inetref,season,episode,filter,recgroupid)
+                                               next_record)
                                        VALUES (?,?,?,
                                                FROM_UNIXTIME(?),FROM_UNIXTIME(?),FROM_UNIXTIME(?),FROM_UNIXTIME(?),
-                                               ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                                               ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
                          _or($this->recordid,      0,          true),
                          _or($this->type,          0,          true),
                          $this->chanid,
@@ -379,18 +382,10 @@ class Schedule extends MythBase {
                          _or($this->autouserjob2,  0,          true),
                          _or($this->autouserjob3,  0,          true),
                          _or($this->autouserjob4,  0,          true),
-                         _or($this->autometadata,  0,          true),
                          _or($this->playgroup,     'Default'       ),
                          _or($this->storagegroup,  'Default'       ),
                          _or($this->prefinput,     0,          true),
-                         _or($this->next_record,   NULL            ),
-                         _or($this->last_record,   NULL            ),
-                         _or($this->last_delete,   NULL            ),
-                         _or($this->inetref,       ''              ),
-                         _or($this->season,        0              ),
-                         _or($this->episode,       0              ),
-                         _or($this->filter,        0              ),
-                         _or($this->recgroupid,    1              )
+                         _or($this->next_record,   NULL            )
                         );
     // Get the id that was returned
         $recordid = $sh->insert_id();

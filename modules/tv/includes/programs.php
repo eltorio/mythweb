@@ -163,7 +163,6 @@
                               WHERE recstatus IN (-3, 11)
                                     AND programid = ?
                                     AND seriesid  = ?
-                                    AND future = 0
                              LIMIT 1');
         $sh3 = $db->prepare('SELECT recstatus
                                FROM oldrecorded
@@ -171,7 +170,6 @@
                                     AND title       = ?
                                     AND subtitle    = ?
                                     AND description = ?
-                                    AND future = 0 
                              LIMIT 1');
     // Load in all of the programs (if any?)
         $these_programs = array();

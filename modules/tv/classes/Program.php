@@ -139,15 +139,15 @@ class Program extends MythBase {
                 $this->url = video_url($this); // get download info
             }
         // Assign the program flags
-            $this->has_commflag   = ($this->progflags & 0x00000001) ? true : false;    // FL_COMMFLAG       = 0x00000001
-            $this->has_cutlist    = ($this->progflags & 0x00000002) ? true : false;    // FL_CUTLIST        = 0x00000002
-            $this->auto_expire    = ($this->progflags & 0x00000004) ? true : false;    // FL_AUTOEXP        = 0x00000004
-            $this->is_editing     = ($this->progflags & 0x00000008) ? true : false;    // FL_EDITING        = 0x00000008
-            $this->bookmark       = ($this->progflags & 0x00000010) ? true : false;    // FL_BOOKMARK       = 0x00000010
-            $this->is_recording   = ($this->progflags & 0x00100000) ? true : false;    // FL_INUSERECORDING = 0x00100000
-            $this->is_playing     = ($this->progflags & 0x00200000) ? true : false;    // FL_INUSEPLAYING   = 0x00200000
-            $this->is_transcoded  = ($this->progflags & 0x00000100) ? true : false;    // FL_TRANSCODED     = 0x00000100
-            $this->is_watched     = ($this->progflags & 0x00000200) ? true : false;    // FL_WATCHED        = 0x00000200
+            $this->has_commflag   = ((int)$this->progflags & 0x00000001) ? true : false;    // FL_COMMFLAG       = 0x00000001
+            $this->has_cutlist    = ((int)$this->progflags & 0x00000002) ? true : false;    // FL_CUTLIST        = 0x00000002
+            $this->auto_expire    = ((int)$this->progflags & 0x00000004) ? true : false;    // FL_AUTOEXP        = 0x00000004
+            $this->is_editing     = ((int)$this->progflags & 0x00000008) ? true : false;    // FL_EDITING        = 0x00000008
+            $this->bookmark       = ((int)$this->progflags & 0x00000010) ? true : false;    // FL_BOOKMARK       = 0x00000010
+            $this->is_recording   = ((int)$this->progflags & 0x00100000) ? true : false;    // FL_INUSERECORDING = 0x00100000
+            $this->is_playing     = ((int)$this->progflags & 0x00200000) ? true : false;    // FL_INUSEPLAYING   = 0x00200000
+            $this->is_transcoded  = ((int)$this->progflags & 0x00000100) ? true : false;    // FL_TRANSCODED     = 0x00000100
+            $this->is_watched     = ((int)$this->progflags & 0x00000200) ? true : false;    // FL_WATCHED        = 0x00000200
         // Can be deleted?
             $this->can_delete     = (!$this->is_recording && !$this->is_playing) || $this->recgroup != 'LiveTV';
         // Add a generic "will record" variable, too
@@ -209,8 +209,8 @@ class Program extends MythBase {
         $this->deaf_signed                  = $this->subtitletype    & 0x08;
     // Generate the star string, since mysql has issues with REPEAT() and
     // decimals, and the backend doesn't do it for us, anyway.
-        $this->starstring = @str_repeat(star_character, intVal($this->stars * max_stars));
-        $frac = ($this->stars * max_stars) - intVal($this->stars * max_stars);
+        $this->starstring = @str_repeat(star_character, intVal((int)$this->stars * max_stars));
+        $frac = ((int)$this->stars * max_stars) - intVal((int)$this->stars * max_stars);
         if ($frac >= .75)
             $this->starstring .= '&frac34;';
         elseif ($frac >= .5)
@@ -219,15 +219,15 @@ class Program extends MythBase {
             $this->starstring .= '&frac14;';
     // Get the name of the input
         if ($this->inputid) {
-            $this->inputname = $db->query_col('SELECT displayname
+            $this->inputname = $db->query_col('SELECT videodevice
                                                  FROM capturecard
                                                 WHERE cardid=?',
                                               $this->inputid);
         }
 	else {
-            $this->inputname = $db->query_col('SELECT inputname
+            $this->inputname = $db->query_col('SELECT chanid
                                                  FROM recorded
-                                                WHERE recordedid=?',
+                                                WHERE recordid=?',
                                               $this->recordedid);
 	}
     // Turn recstatus into a word
@@ -246,9 +246,9 @@ class Program extends MythBase {
 
     // Calculate the duration
         if ($this->recendts)
-            $this->length = $this->recendts - $this->recstartts;
+            $this->length = (int)$this->recendts - (int)$this->recstartts;
         else
-            $this->length = $this->endtime  - $this->starttime;
+            $this->length = (int)$this->endtime  - (int)$this->starttime;
 
     // A special recstatus for shows that this was manually set to record
         if ($this->rectype == rectype_override)
@@ -579,7 +579,7 @@ class Program extends MythBase {
                                       AND credits.role      = ?
                                       AND credits.chanid    = ?
                                       AND credits.starttime = FROM_UNIXTIME(?)
-                                      ORDER BY credits.priority',
+				      ',
                                    $role,
                                    $this->chanid,
                                    $this->starttime
@@ -782,10 +782,11 @@ class Program extends MythBase {
     }
 
     public function getAspect() {
+	    return 16/9;
         global $db;
         $sh = $db->query('SELECT aspect
                             FROM recordedfile
-                           WHERE recordedid = ?',
+                           WHERE recordid = ?',
                            $this->recordedid
                            );
         $row = $sh->fetch_assoc();

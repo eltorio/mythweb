@@ -112,6 +112,8 @@ class MythBackend {
     }
 
     public function setTimezone() {
+	    //don't work for me
+	    return;
         if (!is_string($_SESSION['backend']['timezone']['value']) || time() - $_SESSION['backend']['timezone']['last_check_time'] > 60*60*24) {
             $response = $this->sendCommand('QUERY_TIME_ZONE');
             $timezone = str_replace(' ', '_', $response[0]);
